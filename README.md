@@ -67,6 +67,11 @@ source install/setup.bash
 ros2 run beginner_tutorials listener
 ```
 
+## Service Call To modify the string
+```bash
+ros2 service call /change_string beginner_tutorials/srv/ChangeString "{input: 'Lena'}"
+```
+
 ## Clang-Formating
 ```bash
 cd ~/ros2_ws
