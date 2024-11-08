@@ -9,6 +9,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -23,6 +24,9 @@ if(BUILD_TESTING)
 endif()
 
 
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "srv/ChangeString.srv"
+)
 # ament_export_dependencies(rosidl_default_runtime)
 
 add_executable(talker src/publisher_member_function.cpp)
