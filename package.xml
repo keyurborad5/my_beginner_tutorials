@@ -3,7 +3,7 @@
 <package format="3">
   <name>beginner_tutorials</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>This Package Publishes to a topic and subcribes to the same topic, demonstrating the pub-sub in ROS2</description>
   <maintainer email="keyurborad5@gmail.com">keyur22</maintainer>
   <license>Apache-2.0</license>
 
@@ -11,6 +11,7 @@
 
   <depend>rclcpp</depend>
   <depend>std_msgs</depend>
+
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
