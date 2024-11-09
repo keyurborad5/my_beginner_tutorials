@@ -28,6 +28,9 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/ChangeString.srv"
 )
 # ament_export_dependencies(rosidl_default_runtime)
+install(DIRECTORY launch/
+  DESTINATION share/${PROJECT_NAME}/launch
+)
 
 add_executable(talker src/publisher_member_function.cpp)
 ament_target_dependencies(talker rclcpp std_msgs)

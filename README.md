@@ -81,7 +81,12 @@ ros2 param get /my_publisher freq
 # Set the parameter value
 ros2 param set /my_publisher freq 1.0 
 ```
-
+## Launch file
+```bash
+ros2 launch beginner_tutorial pub_sub_launch.launch.py
+#if want to start launcher with publisher rate
+ros2 launch beginner_tutorial pub_sub_launch.launch.py freq:=2.0
+```
 ## Clang-Formating
 ```bash
 cd ~/ros2_ws
