@@ -67,6 +67,26 @@ source install/setup.bash
 ros2 run beginner_tutorials listener
 ```
 
+## Service Call To modify the string
+```bash
+ros2 service call /change_string beginner_tutorials/srv/ChangeString "{input: 'Lena'}"
+```
+## Changing Parameters
+Here we are changing the rate of publishing the custom message using the parameter
+```bash
+# Changinh the rate of publishing while starting the node using ros run
+ros2 run beginner_tutorials talker --ros-args -p freq:=10.0
+# Checking the parameter value
+ros2 param get /my_publisher freq
+# Set the parameter value
+ros2 param set /my_publisher freq 1.0 
+```
+## Launch file
+```bash
+ros2 launch beginner_tutorial pub_sub_launch.launch.py
+#if want to start launcher with publisher rate
+ros2 launch beginner_tutorial pub_sub_launch.launch.py freq:=2.0
+```
 ## Clang-Formating
 ```bash
 cd ~/ros2_ws
