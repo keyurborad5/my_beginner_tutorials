@@ -71,6 +71,16 @@ ros2 run beginner_tutorials listener
 ```bash
 ros2 service call /change_string beginner_tutorials/srv/ChangeString "{input: 'Lena'}"
 ```
+## Changing Parameters
+Here we are changing the rate of publishing the custom message using the parameter
+```bash
+# Changinh the rate of publishing while starting the node using ros run
+ros2 run beginner_tutorials talker --ros-args -p freq:=10.0
+# Checking the parameter value
+ros2 param get /my_publisher freq
+# Set the parameter value
+ros2 param set /my_publisher freq 1.0 
+```
 
 ## Clang-Formating
 ```bash

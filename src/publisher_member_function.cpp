@@ -9,21 +9,33 @@
 
 using namespace std::chrono_literals;
 
-/* This example creates a subclass of Node and uses std::bind() to register a
- * member function as a callback from the timer. */
+// parameter types
+using PARAMETER_EVENT  = std::shared_ptr<rclcpp::ParameterEventHandler>;
+using PARAMETER_HNADLE = std::shared_ptr<rclcpp::ParameterCallbackHandle>;
 
 class MyPublisher : public rclcpp::Node {
  public:
   MyPublisher() : Node("my_publisher"), count_(0) {
-    publisher_ =
-        this->create_publisher<std_msgs::msg::String>("keyurs_topic", 10);
-    timer_ = this->create_wall_timer(
-        500ms, std::bind(&MyPublisher::timer_callback, this));
     
+    
+    auto param_desc = rcl_interfaces::msg::ParameterDescriptor{};
+    param_desc.description = "This parameter is to set the rate of publisher!";
+    this->declare_parameter("freq", 5.0, param_desc);
+    auto freq = this->get_parameter("freq").as_double();
+
+    // auto freq = param.get_parameter_value().get<std::float_t>(); // get new value, if any
+    m_param_subscriber_ = std::make_shared<rclcpp::ParameterEventHandler>(this);
+    auto paramCallbackPtr = std::bind (&MyPublisher::param_callback, this, std::placeholders::_1);
+    m_paramHandle_ = m_param_subscriber_->add_parameter_callback ("freq", paramCallbackPtr);
+
+    publisher_ =this->create_publisher<std_msgs::msg::String>("keyurs_topic", 10);
+    timer_ = this->create_wall_timer(std::chrono::milliseconds(static_cast<int>((1000/freq))), 
+                                      std::bind(&MyPublisher::timer_callback, this));
     // Service to change string content dynamically
     service_ = this->create_service<beginner_tutorials::srv::ChangeString>(
         "change_string",
-        std::bind(&MyPublisher::update_string, this, std::placeholders::_1,
+        std::bind(&MyPublisher::update_string, this, 
+                  std::placeholders::_1,
                   std::placeholders::_2));
   }
 
@@ -49,7 +61,23 @@ class MyPublisher : public rclcpp::Node {
     RCLCPP_INFO_STREAM(this->get_logger(), "Sending back response: ["
                                                << response->output.c_str()
                                                << "]");
-  } 
+  }
+
+  void param_callback (const rclcpp::Parameter & param) {
+    RCLCPP_INFO (this->get_logger(),
+                 "cb: Received an update to parameter \"%s\" of type %s: %.2f",
+                 param.get_name().c_str(),
+                 param.get_type_name().c_str(),
+                 param.as_double());
+
+    // replace existing topic timer with a new one running at the new frequencey
+    auto period = std::chrono::milliseconds ((int) (1000 / param.as_double()));
+    auto topicCallbackPtr = std::bind (&MyPublisher::timer_callback, this);
+    timer_ = this->create_wall_timer (period, topicCallbackPtr); // no memory leak here
+  }
+   
+  PARAMETER_EVENT  m_param_subscriber_;
+  PARAMETER_HNADLE m_paramHandle_;
   rclcpp::TimerBase::SharedPtr timer_;
   std::string service_msg = "Keyur";
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
