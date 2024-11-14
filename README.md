@@ -87,6 +87,16 @@ ros2 launch beginner_tutorial pub_sub_launch.launch.py
 #if want to start launcher with publisher rate
 ros2 launch beginner_tutorial pub_sub_launch.launch.py freq:=2.0
 ```
+## Run TF Static Transform
+```bash
+# run the talker node
+ros2 run beginner_tutorials talker
+# Verify TF frames using
+ros2 run tf2_ros tf2_echo world talk
+# To create the TF tree PDF
+ros2 run tf2_tools view_frames
+```
+
 ## Clang-Formating
 ```bash
 cd ~/ros2_ws
