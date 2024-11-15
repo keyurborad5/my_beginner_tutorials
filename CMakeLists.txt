@@ -13,6 +13,7 @@ find_package(geometry_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(catch_ros2 REQUIRED)
+find_package(rosbag2_cpp REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 # set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # Enable compile_commands.json

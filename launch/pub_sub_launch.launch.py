@@ -1,12 +1,45 @@
+import os
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch.actions import DeclareLaunchArgument, Shutdown
+from launch.actions import DeclareLaunchArgument, TimerAction, OpaqueFunction
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
+from launch.actions import ExecuteProcess
+from launch.conditions import IfCondition
+
+def generate_bag_directory(context):
+    # Define the bag directory inside a branch-specific results folder
+    results_dir = os.path.join(os.getcwd(), "src/beginner_tutorials/results")
+    bag_dir = os.path.join(results_dir, "recorded_bag")
+    # Ensure the directory exists
+    os.makedirs(bag_dir, exist_ok=True)
+    return bag_dir
+
+def launch_setup(context, *args, **kwargs):
+    # Get the bag directory path
+    bag_dir = generate_bag_directory(context)
+    print(bag_dir)
+    # Define the duration for which to record the bag (~15 seconds)
+    record_duration = 15.0  # seconds
+
+    # Set up the bag recording command
+    record_bag = ExecuteProcess(
+        cmd=['ros2', 'bag', 'record', '-a'],
+        condition=IfCondition(LaunchConfiguration('enable_bag_record')),
+        output='screen',
+        cwd=['src/beginner_tutorials/results/recorded_bag']
+    )
+
+    # Timer to stop the recording after ~15 seconds
+    stop_recording = ExecuteProcess(
+        cmd=['pkill', '-f', 'ros2 bag record'],
+        output='screen',
+        condition=IfCondition(LaunchConfiguration('enable_bag_record'))
+    )
+
+    return [record_bag, TimerAction(period=record_duration, actions=[stop_recording])]
 
 # Function to generate launch description
-
-
 def generate_launch_description():
     # Declare frequency argument
     freq_arg = DeclareLaunchArgument(
@@ -14,18 +47,27 @@ def generate_launch_description():
         default_value='1.0',  # Default frequency if none is provided
         description='Frequency for the publisher node in Hz'
     )
-    # Declare test duration argument
+    # Define the enable_bag_record argument to toggle bag recording
+    enable_bag_record = DeclareLaunchArgument(
+        'enable_bag_record',
+        default_value='false',
+        description='Flag to enable or disable bag recording'
+    )
+    # Define the duration for which to record the bag (~15 seconds)
+    record_duration = 15  # seconds
+    # Set up the bag recording command
+    record_bag = ExecuteProcess(
+        cmd=['ros2', 'bag', 'record', '-a'],
+        # condition=LaunchConfiguration('enable_bag_record').to_bool() == True,
+        output='screen'
+    )
+    # Timer to stop the recording after ~15 seconds
+    stop_recording = ExecuteProcess(
+        cmd=['pkill', '-f', 'ros2 bag record'],
+        output='screen',
+        # condition=LaunchConfiguration('enable_bag_record').to_bool() == True
+    )
 
-    test_duration = DeclareLaunchArgument(
-        'test_duration',
-        default_value='5.0',
-        description="Max length of test in seconds"
-    )
-    result_file_arg = DeclareLaunchArgument(
-        'result_file',
-        default_value='/home/keyur22/enpm700/ROS2_tut/ros2_ws/build/beginner_tutorials/test_results/beginner_tutorials/Level2_Integration_Test.xml',
-        description='File path where test results are saved.'
-    )
     # create handle for publisher node
     minimal_publisher_node = Node(
             package='beginner_tutorials',
@@ -41,25 +83,12 @@ def generate_launch_description():
             name='my_subscriber',
             output='screen',
         )
-    lvl2_integration_test = Node(
-            package='beginner_tutorials',
-            executable='level2_integration_test',
-            name='integration_test',
-            parameters=[{
-                'test_duration': LaunchConfiguration('test_duration')
-
-            }],
-            # arguments=[LaunchConfiguration('result_file')],
-             output='screen',
-            # Set 'required=True' to terminate the launch when this node finishes
-            on_exit=[Shutdown()]
-    )
+    
     # return launch description
     return LaunchDescription([
         freq_arg,
-        test_duration,
-        # lvl2_integration_test,
-        # result_file_arg,
-        minimal_publisher_node
-        # minimal_subscriber_node
+        enable_bag_record,
+        minimal_publisher_node,
+        minimal_subscriber_node,
+        OpaqueFunction(function=launch_setup)
     ])

@@ -96,6 +96,30 @@ ros2 run tf2_ros tf2_echo world talk
 # To create the TF tree PDF
 ros2 run tf2_tools view_frames
 ```
+## To run level 2 integration test
+```bash
+cd ~/ros2_ws
+# build the package
+colcon build --packages-select beginner_tutorials
+# ctest
+colcon test --packages-select beginner_tutorials
+# See the output results
+cat log/latest_test/beginner_tutorials/stdout_stderr.log
+
+```
+## To Record and play a bag for 15 sec
+```bash
+# run the launch file with ros bag enabled
+ros2 launch beginner_tutorials pub_sub_launch.launch.py enable_bag_record:=true
+# A ros bag will be generated in the results/recorded_bag directory
+cd ~/ros_ws/src/my_beginner_tutorial/results/recorded_bag
+ros2 bag play <name of the bag folder w/o brackets>
+# to verify the recorded message (execute in another terminal)
+ros2 run beginner_tutorials listerner
+# execute in third terminal
+ros2 topic echo /tf_static
+
+```
 
 ## Clang-Formating
 ```bash
