@@ -131,7 +131,7 @@ clang-format -i --style=Google $(find . -name *.cpp -o -name *.hpp | grep -v "/b
 ## Cpp-Lint
 ```bash
 # go to your ros2 workspace directory
-cd ~/ros2_ws
+cd ~/ros2_ws/src
 #Cpp Lint
 cpplint --filter=-legal/copyright,-build/c++11,+build/c++17,-build/namespaces,-build/include_order $(find . -name *.cpp | grep -v "/build/")
 
@@ -142,7 +142,7 @@ cd ~/ros2_ws
 # Build the workspace again with the camake args to generate compile_commands.jason file for Clang-tidy to work
 colcon build --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 #Clang-tidy command
-clang-tidy -p build/beginner_tutorials --extra-arg=-std=c++17 src/beginner_tutorials/src/*.cpp
+clang-tidy -p build/beginner_tutorials --extra-arg=-std=c++17 src/my_beginner_tutorials/src/*.cpp
 ```
 
 ## Acknowledgement

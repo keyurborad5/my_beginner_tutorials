@@ -14,11 +14,10 @@
 #include <memory>
 #include <string>
 
-
 #include "beginner_tutorials/srv/change_string.hpp"
+#include "geometry_msgs/msg/transform_stamped.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
-#include "geometry_msgs/msg/transform_stamped.hpp"
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_ros/static_transform_broadcaster.h"
 
@@ -73,9 +72,9 @@ class MyPublisher : public rclcpp::Node {
                   std::placeholders::_2));
     /////////////////////////// Broadcaster ///////////////////////////
 
-    tf_static_broadcaster_= std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
+    tf_static_broadcaster_ =
+        std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
     this->make_transforms();
-    
   }
 
  private:
@@ -148,13 +147,14 @@ class MyPublisher : public rclcpp::Node {
                                                << " : " << param.as_double());
 
     // replace existing topic timer with a new one running at the new frequencey
-    auto period = std::chrono::milliseconds((int)(1000 / param.as_double()));
+    auto period = std::chrono::milliseconds(
+                    static_cast<int>(1000 /param.as_double()));
     auto topicCallbackPtr = std::bind(&MyPublisher::timer_callback, this);
     timer_ = this->create_wall_timer(period,
                                      topicCallbackPtr);  // no memory leak here
   }
 
-  void make_transforms(){
+  void make_transforms() {
     geometry_msgs::msg::TransformStamped t;
     t.header.stamp = this->get_clock()->now();
     t.header.frame_id = "world";
@@ -164,7 +164,7 @@ class MyPublisher : public rclcpp::Node {
     t.transform.translation.y = -20;
     t.transform.translation.z = 10;
     tf2::Quaternion q;
-    q.setRPY(1.57,0.349,-2.0944);
+    q.setRPY(1.57, 0.349, -2.0944);
     t.transform.rotation.x = q.x();
     t.transform.rotation.y = q.y();
     t.transform.rotation.z = q.z();
