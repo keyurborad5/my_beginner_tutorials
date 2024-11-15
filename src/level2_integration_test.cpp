@@ -1,26 +1,13 @@
-// Copyright 2023 Nick Morales.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-// # CHANGES:
-//
-// 2024-10-31, Tommy Chang
-//     - Renamed the first test case to "service_test".
-//     - Added a second test, "talker_test".
-//     - Rewrite the first test case to use wait_for_service().
-//     - Use modern ROS2 syntax
-//     - Use Catch2 Fixture
-
+/**
+ * @file level2_integration_test.cpp
+ * @author Keyur Borad (keyurborad5@gmail.com)
+ * @brief This cpp file is a level2 integration file to verify the unit test of publishing topic "keyurs_topic"
+ * @version 0.1
+ * @date 2024-11-15
+ * 
+ * @copyright Copyright (c) 2024
+ * 
+ */
 #include <catch_ros2/catch_ros2.hpp>
 #include <chrono>
 #include <rclcpp/executors.hpp>
@@ -28,7 +15,6 @@
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/string.hpp>
 
-// #include "beginner_tutorials/srv/change_string.hpp"
 
 using namespace std::chrono_literals;
 using std_msgs::msg::String;
@@ -37,9 +23,16 @@ using std_msgs::msg::String;
 // Define Fixture
 ////////////////////////////////////////////////
 auto Logger = rclcpp::get_logger("");  // create an initial Logger
-
+/**
+ * @brief Class MyTestsFixure to make a test fixtures
+ * 
+ */
 class MyTestsFixture {
  public:
+ /**
+  * @brief Construct a new My Tests Fixture object
+  * 
+  */
   MyTestsFixture() {
     /**
      * 1.) Create the node that performs the test. (aka Integration test node):
@@ -71,7 +64,7 @@ class MyTestsFixture {
 };
 
 ////////////////////////////////////////////////
-// Test Case 2
+// Test Case 1
 ////////////////////////////////////////////////
 
 /* In this test case, the node under test (aka Auxiliary test node)
@@ -103,7 +96,7 @@ TEST_CASE_METHOD(MyTestsFixture, "test topic talker", "[topic]") {
   /**
    * 5.) Finally do the actual test:
    */
-  rclcpp::Rate rate(5.0);  // 10hz checks
+  rclcpp::Rate rate(5.0);  // 5hz checks
   auto start_time = rclcpp::Clock().now();
   auto duration = rclcpp::Clock().now() - start_time;
   auto timeout = rclcpp::Duration::from_seconds(TEST_DURATION);

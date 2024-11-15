@@ -7,18 +7,9 @@ from launch.substitutions import LaunchConfiguration
 from launch.actions import ExecuteProcess
 from launch.conditions import IfCondition
 
-def generate_bag_directory(context):
-    # Define the bag directory inside a branch-specific results folder
-    results_dir = os.path.join(os.getcwd(), "src/beginner_tutorials/results")
-    bag_dir = os.path.join(results_dir, "recorded_bag")
-    # Ensure the directory exists
-    os.makedirs(bag_dir, exist_ok=True)
-    return bag_dir
 
 def launch_setup(context, *args, **kwargs):
-    # Get the bag directory path
-    bag_dir = generate_bag_directory(context)
-    print(bag_dir)
+    
     # Define the duration for which to record the bag (~15 seconds)
     record_duration = 15.0  # seconds
 
