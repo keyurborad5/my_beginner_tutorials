@@ -45,7 +45,7 @@ class MyPublisher : public rclcpp::Node {
 
     auto param_desc = rcl_interfaces::msg::ParameterDescriptor{};
     param_desc.description = "This parameter is to set the rate of publisher!";
-    this->declare_parameter("freq", 5.0, param_desc);
+    this->declare_parameter("freq", 1.0, param_desc);
     auto freq = this->get_parameter("freq").as_double();
 
     ////////////// Parameter Event Handler Subscriber ///////////////
