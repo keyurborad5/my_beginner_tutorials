@@ -87,6 +87,40 @@ ros2 launch beginner_tutorial pub_sub_launch.launch.py
 #if want to start launcher with publisher rate
 ros2 launch beginner_tutorial pub_sub_launch.launch.py freq:=2.0
 ```
+## Run TF Static Transform
+```bash
+# run the talker node
+ros2 run beginner_tutorials talker
+# Verify TF frames using
+ros2 run tf2_ros tf2_echo world talk
+# To create the TF tree PDF
+ros2 run tf2_tools view_frames
+```
+## To run level 2 integration test
+```bash
+cd ~/ros2_ws
+# build the package
+colcon build --packages-select beginner_tutorials
+# ctest
+colcon test --packages-select beginner_tutorials
+# See the output results
+cat log/latest_test/beginner_tutorials/stdout_stderr.log
+
+```
+## To Record and play a bag for 15 sec
+```bash
+# run the launch file with ros bag enabled
+ros2 launch beginner_tutorials pub_sub_launch.launch.py enable_bag_record:=true
+# A ros bag will be generated in the results/recorded_bag directory
+cd ~/ros_ws/src/my_beginner_tutorial/results/recorded_bag
+ros2 bag play <name of the bag folder w/o brackets>
+# to verify the recorded message (execute in another terminal)
+ros2 run beginner_tutorials listerner
+# execute in third terminal
+ros2 topic echo /tf_static
+
+```
+
 ## Clang-Formating
 ```bash
 cd ~/ros2_ws
@@ -97,7 +131,7 @@ clang-format -i --style=Google $(find . -name *.cpp -o -name *.hpp | grep -v "/b
 ## Cpp-Lint
 ```bash
 # go to your ros2 workspace directory
-cd ~/ros2_ws
+cd ~/ros2_ws/src
 #Cpp Lint
 cpplint --filter=-legal/copyright,-build/c++11,+build/c++17,-build/namespaces,-build/include_order $(find . -name *.cpp | grep -v "/build/")
 
@@ -108,7 +142,7 @@ cd ~/ros2_ws
 # Build the workspace again with the camake args to generate compile_commands.jason file for Clang-tidy to work
 colcon build --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 #Clang-tidy command
-clang-tidy -p build/beginner_tutorials --extra-arg=-std=c++17 src/beginner_tutorials/src/*.cpp
+clang-tidy -p build/beginner_tutorials --extra-arg=-std=c++17 src/my_beginner_tutorials/src/*.cpp
 ```
 
 ## Acknowledgement

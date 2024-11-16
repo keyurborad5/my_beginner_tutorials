@@ -15,8 +15,11 @@
 #include <string>
 
 #include "beginner_tutorials/srv/change_string.hpp"
+#include "geometry_msgs/msg/transform_stamped.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
+#include "tf2/LinearMath/Quaternion.h"
+#include "tf2_ros/static_transform_broadcaster.h"
 
 using namespace std::chrono_literals;
 
@@ -41,7 +44,7 @@ class MyPublisher : public rclcpp::Node {
 
     auto param_desc = rcl_interfaces::msg::ParameterDescriptor{};
     param_desc.description = "This parameter is to set the rate of publisher!";
-    this->declare_parameter("freq", 5.0, param_desc);
+    this->declare_parameter("freq", 1.0, param_desc);
     auto freq = this->get_parameter("freq").as_double();
 
     ////////////// Parameter Event Handler Subscriber ///////////////
@@ -67,6 +70,11 @@ class MyPublisher : public rclcpp::Node {
         "change_string",
         std::bind(&MyPublisher::update_string, this, std::placeholders::_1,
                   std::placeholders::_2));
+    /////////////////////////// Broadcaster ///////////////////////////
+
+    tf_static_broadcaster_ =
+        std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
+    this->make_transforms();
   }
 
  private:
@@ -139,14 +147,34 @@ class MyPublisher : public rclcpp::Node {
                                                << " : " << param.as_double());
 
     // replace existing topic timer with a new one running at the new frequencey
-    auto period = std::chrono::milliseconds((int)(1000 / param.as_double()));
+    auto period = std::chrono::milliseconds(
+                    static_cast<int>(1000 /param.as_double()));
     auto topicCallbackPtr = std::bind(&MyPublisher::timer_callback, this);
     timer_ = this->create_wall_timer(period,
                                      topicCallbackPtr);  // no memory leak here
   }
 
-  /////////////////////////// Attributes ///////////////////////////
+  void make_transforms() {
+    geometry_msgs::msg::TransformStamped t;
+    t.header.stamp = this->get_clock()->now();
+    t.header.frame_id = "world";
+    t.child_frame_id = "talk";
 
+    t.transform.translation.x = 5;
+    t.transform.translation.y = -20;
+    t.transform.translation.z = 10;
+    tf2::Quaternion q;
+    q.setRPY(1.57, 0.349, -2.0944);
+    t.transform.rotation.x = q.x();
+    t.transform.rotation.y = q.y();
+    t.transform.rotation.z = q.z();
+    t.transform.rotation.w = q.w();
+
+    tf_static_broadcaster_->sendTransform(t);
+  }
+
+  /////////////////////////// Attributes ///////////////////////////
+  std::shared_ptr<tf2_ros::StaticTransformBroadcaster> tf_static_broadcaster_;
   PARAMETER_EVENT m_param_subscriber_;
   PARAMETER_HNADLE m_paramHandle_;
   rclcpp::TimerBase::SharedPtr timer_;
